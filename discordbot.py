@@ -5,8 +5,7 @@ from os import getenv
 from datetime import datetime
 
 
-intents = discord.Intents.default()
-intents.message_content = True
+intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='/', intents=intents)
 
