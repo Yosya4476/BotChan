@@ -18,15 +18,17 @@ text_id = 952047855990882317
 # メッセージ受信時に動作する処理 #
 @bot.event
 async def on_message(message): 
-  # embedを設定する
-#   embed = discord.Embed(title="title",
-#                           description=message,
-#                           color=0x112233,
-#                           timestamp=datetime.now(datetime.timezone.utc))
-#   embed.set_author(name="Yatta",
-#                      icon_url="Clear")
+  if message.content == 'Ping':
+    await message.channel.send('Pong!')
+      # embedを設定する
+  embed = discord.Embed(title="title",
+                          description=message,
+                          color=0x112233,
+                          timestamp=datetime.now(datetime.timezone.utc))
+  embed.set_author(name="Yatta",
+                     icon_url="Clear")
     # embedを送信する
-  await message.channel.send(message)
+  await message.channel.send(embed=embed)
   await bot.process_commands(message)
 
   
