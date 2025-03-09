@@ -18,9 +18,7 @@ text_id = 952047855990882317
 # メッセージ受信時に動作する処理 #
 @bot.event
 async def on_message(message): 
-  if message.content == 'Ping':
-    await message.channel.send('Pong!')
-      # embedを設定する
+  # embedを設定する
   embed = discord.Embed(title="title",
                           description=message,
                           color=0x112233,
