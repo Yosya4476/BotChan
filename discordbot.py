@@ -30,8 +30,8 @@ async def on_voice_state_update(member, before, after):
   alert_channel = bot.get_channel(text_id)
 
   # ボイスチャンネルを入室または退室したかを判定する
-  if before.channel != after.channel:
-    await alert_channel.send(f"#{after} だよ")
+  if before.channel is not after.channel:
+    await alert_channel.send(f"#{after} です")
     # ボイスチャンネルに入室したときの処理
     if before.channel is None:
       title = f"#{after.channel.name} に入室"
