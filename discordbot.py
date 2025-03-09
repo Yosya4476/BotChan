@@ -54,7 +54,8 @@ async def on_voice_state_update(member, before, after):
     embed = discord.Embed(title=title,
                           description=message,
                           color=color)
-    
+    embed.set_author(name=member.name,
+                     icon_url=member.avatar.url)
     # embedを送信する
     await alert_channel.send(embed=embed)
    
