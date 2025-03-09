@@ -21,7 +21,6 @@ async def on_message(message):
   alert_channel = bot.get_channel(text_id)  
   if message.content == 'Ping':
     await message.channel.send('Pong!')
-    await alert_channel.send('Pong!')
   await bot.process_commands(message)
 
   
