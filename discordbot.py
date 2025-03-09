@@ -17,9 +17,11 @@ text_id = 952047855990882317
 
 # メッセージ受信時に動作する処理 #
 @bot.event
-async def on_message(message):   
+async def on_message(message): 
+  alert_channel = bot.get_channel(text_id)  
   if message.content == 'Ping':
     await message.channel.send('Pong!')
+    await alert_channel.send('Pong!')
   await bot.process_commands(message)
 
   
