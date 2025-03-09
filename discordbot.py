@@ -49,8 +49,8 @@ async def on_voice_state_update(member, before, after):
                           description=message,
                           color=color,
                           timestamp=datetime.now(datetime.timezone.utc))
-    embed.set_author(name=member.name,
-                     icon_url=member.avatar_url)
+    # embed.set_author(name=member.name, icon_url=member.avatar_url)
+    
     # embedを送信する
     await alert_channel.send(embed=embed)
    
