@@ -29,7 +29,8 @@ async def on_message(message):
 @bot.event
 async def on_voice_state_update(member, before, after):
   alert_channel = bot.get_channel(text_id)
-  await alert_channel.send('Pong!')
+  await alert_channel.send(before.channel)
+  await alert_channel.send(after.channel)
   # ボイスチャンネルを入室または退室したかを判定する
   if before.channel != after.channel:
     
