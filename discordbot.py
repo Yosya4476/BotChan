@@ -34,14 +34,14 @@ async def on_voice_state_update(member, before, after):
     
     # ボイスチャンネルに入室したときの処理
     if before.channel is None:
-      await alert_channel.send(f"#{after} です")
+      await alert_channel.send(f"#{after} ですわよ")
       title = f"#{after.channel.name} に入室"
       message = "ボイスチャンネルに入室したよ！"
       color = 0x7289da
       
     # ボイスチャンネルを退室したときの処理
     elif after.channel is None:
-      await alert_channel.send(f"#{after} です")
+      await alert_channel.send(f"#{after} ですわよ")
       title = f"#{before.channel.name} を退室"
       message = "ボイスチャンネルを退室したよ！"
       color = 0xffa500
