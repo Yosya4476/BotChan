@@ -6,6 +6,7 @@ from datetime import datetime
 
 
 intents = discord.Intents.all()
+intents.voice_states = True
 
 bot = commands.Bot(command_prefix='/', intents=intents)
 
