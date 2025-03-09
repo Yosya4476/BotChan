@@ -30,7 +30,7 @@ async def on_voice_state_update(member, before, after):
   alert_channel = bot.get_channel(text_id)
 
   # ボイスチャンネルを入室または退室したかを判定する
-  if before.channel is not after.channel:
+  # if before.channel is not after.channel:
     
     # # ボイスチャンネルに入室したときの処理
     # if before.channel is None:
@@ -45,12 +45,12 @@ async def on_voice_state_update(member, before, after):
     #   color = 0xffa500
 
     # embedを設定する
-    embed = discord.Embed(title="Yes",
-                          description="message",
-                          color=0xffa550)
-    embed.set_author(name=member.name,icon_url=member.avatar_url)
+  embed = discord.Embed(title="Yes",
+                            description="message",
+                            color=0xffa550)
+  embed.set_author(name=member.name,icon_url=member.avatar_url)
     # embedを送信する
-    await alert_channel.send(embed=embed)
+  await alert_channel.send(embed=embed)
    
   await bot.process_commands(member, before, after)
 
