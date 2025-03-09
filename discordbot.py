@@ -21,10 +21,11 @@ async def on_message(message):
   alert_channel = bot.get_channel(text_id)  
   if message.content == 'Ping':
     await message.channel.send('Pong!')
+    await alert_channel.send('Pong!')
   await bot.process_commands(message)
 
   
-# ボイスチャンネルの入退室時に動作する処理
+# ボイスチャンネルの入退室時に動作する処理 #
 @bot.event
 async def on_voice_state_update(member, before, after):
   alert_channel = bot.get_channel(text_id)
@@ -54,6 +55,7 @@ async def on_voice_state_update(member, before, after):
     # embedを送信する
     await alert_channel.send(embed=embed)
    
+  await bot.process_commands(member, before, after)
 
   
 # コマンドを入力したときの処理
