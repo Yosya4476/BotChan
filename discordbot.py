@@ -6,7 +6,6 @@ from datetime import datetime
 
 
 intents = discord.Intents.all()
-intents.voice_states = True
 
 bot = commands.Bot(command_prefix='/', intents=intents)
 
@@ -26,7 +25,7 @@ async def on_message(message):
 @bot.event
 async def on_voice_state_update(member, before, after):
   alert_channel = bot.get_channel(text_id)
-  
+  await alert_channel.channel.send('Pong!')
   # ボイスチャンネルを入室または退室したかを判定する
   if before.channel != after.channel:
     
