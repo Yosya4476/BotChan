@@ -2,7 +2,7 @@ import discord
 import traceback
 from discord.ext import commands
 from os import getenv
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 intents = discord.Intents.all()
@@ -53,7 +53,8 @@ async def on_voice_state_update(member, before, after):
     # embedを設定する
     embed = discord.Embed(title=title,
                           description=message,
-                          color=color)
+                          color=color,
+                          timestamp=datetime.now(timezone.utc))
     embed.set_author(name=member.name,
                      icon_url=member.avatar.url)
     # embedを送信する
