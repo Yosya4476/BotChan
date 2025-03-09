@@ -21,7 +21,7 @@ async def on_message(message):
   if message.content == 'Ping':
     desc = "ボイスチャンネルに入室したよ！"
     color = 0x7289da
-    embed = discord.Embed(title="title",
+    embed = discord.Embed(title=f"#{message.content}",
                           description=desc,
                           color=color)
     await message.channel.send(embed=embed)
