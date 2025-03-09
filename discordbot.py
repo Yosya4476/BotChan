@@ -20,11 +20,12 @@ text_id = 952047855990882317
 async def on_message(message): 
   if message.content == 'Ping':
     title = f"#{message.content}"
-    desc = "ボイスチャンネルに入室したよ！"
+    desc = "ボイスチャンネルに入室！"
     color = 0x7289da
     embed = discord.Embed(title=title,
                           description=desc,
-                          color=color)
+                          color=color,
+                          timestamp=datetime.now(datetime.timezone.utc))
     await message.channel.send(embed=embed)
       # embedを設定する
   await bot.process_commands(message)
