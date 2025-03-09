@@ -11,7 +11,8 @@ intents.voice_states = True
 bot = commands.Bot(command_prefix='/', intents=intents)
 
 # voice_id = 951851320346816653
-text_id = 952068860629090314
+# text_id = 952068860629090314
+text_id = 952047855990882317
 
 
 # メッセージ受信時に動作する処理 #
