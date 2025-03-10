@@ -1,10 +1,24 @@
 import discord
+from dotenv import load_dotenv
+import os
 import traceback
 from discord.ext import commands
 from os import getenv
 from datetime import datetime, timezone
+import torch
+from torch import autocast
+from diffusers import StableDiffusionPipeline
 
+# 画像生成AIの設定
+load_dotenv();
+MODEL_ID = os.getenv('MODEL_ID')
+DEVICE = os.getenv('DEVICE')
+HUGGINGFACE_TOKEN = os.getenv('HAGGINGFACE_TOKEN')
 
+pipe = StableDiffusionPipeline.from_pretrained(MODEL_ID, revision="fp16", torch_dtype=torch.float16, use_auth_token=HUGGINGFACE_TOKEN)
+pipe.to(DEVICE)
+
+# Botの設定
 intents = discord.Intents.all()
 intents.voice_states = True
 
@@ -64,4 +78,19 @@ async def add(ctx, a: int, b: int):
 
 token = getenv('DISCORD_BOT_TOKEN')
 bot.run(token)
+
+@bot.command()
+async def img(ctx, *args):
+  alert_channel = bot.get_channel(text_id)
+
+  prompt = ' '.join(args)
+  with autocast(DEVICE):
+    # 画像を生成する
+    image = pipe(prompt, guidance_scale=7.5)["images"][0]
+    image.save("output.png")
+
+  with open('output.png', 'rb') as f:
+    picture = discord.File(f)
+    await alert_channel.send(file=picture)
+
 
