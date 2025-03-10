@@ -18,14 +18,8 @@ text_id = 952047855990882317
 # メッセージ受信時に動作する処理 #
 @bot.event
 async def on_message(message): 
-  if message.content == 'Ping':
-    title = f"#{message.content}"
-    desc = "ボイスチャンネルに入室！"
-    color = 0x7289da
-    embed = discord.Embed(title=title,
-                          description=desc,
-                          color=color)
-    await message.channel.send(embed=embed)
+  if message.content == "Ping":
+    await message.channel.send("Pong!")
       # embedを設定する
   await bot.process_commands(message)
 
