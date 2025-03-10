@@ -35,13 +35,13 @@ async def on_voice_state_update(member, before, after):
     # ボイスチャンネルに入室したときの処理
     if before.channel is None:
       title = f"{after.channel.name}に入室"
-      message = f"{member.name}がボイスチャンネルに入室したよ！"
+      message = f"{member}がボイスチャンネルに入室したよ！"
       color = 0x7289da
       
     # ボイスチャンネルを退室したときの処理
     elif after.channel is None:
       title = f"{before.channel.name}から退室"
-      message = f"{member.name}ボイスチャンネルを退室したよ！"
+      message = f"{member}がボイスチャンネルを退室したよ！"
       color = 0xffa500
 
     # embedを設定する
