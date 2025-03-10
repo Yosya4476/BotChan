@@ -5,4 +5,4 @@ discord.py
 transformers
 accelerate
 diffusers
-googletrans
+googletrans==4.0.0rc1
