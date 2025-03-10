@@ -1,1 +1,8 @@
+### Dsicord
 discord.py
+
+### Other
+transformers
+accelerate
+diffusers
+googletrans
