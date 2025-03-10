@@ -76,13 +76,9 @@ async def on_voice_state_update(member, before, after):
 async def add(ctx, a: int, b: int):
     await ctx.send(a+b)
 
-token = getenv('DISCORD_BOT_TOKEN')
-bot.run(token)
 
 @bot.command()
 async def img(ctx, *args):
-  alert_channel = bot.get_channel(text_id)
-
   prompt = ' '.join(args)
   with autocast(DEVICE):
     # 画像を生成する
@@ -91,6 +87,10 @@ async def img(ctx, *args):
 
   with open('output.png', 'rb') as f:
     picture = discord.File(f)
-    await alert_channel.send(file=picture)
+    await ctx.send(file=picture)
+
+token = getenv('DISCORD_BOT_TOKEN')
+bot.run(token)
+
 
 
