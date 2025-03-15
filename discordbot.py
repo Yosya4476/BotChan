@@ -26,11 +26,10 @@ def run_stable_diffusion(prompt: str, num_images: int):
     load_dotenv();
     MODEL_ID = os.getenv('MODEL_ID')
     DEVICE = os.getenv('DEVICE')
-    HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN')
 
     pipe = StableDiffusionPipeline.from_pretrained(
         MODEL_ID,
-        use_auth_token=HUGGINGFACE_TOKEN,
+        use_auth_token=os.environ["HF_TOKEN"],
     ).to(torch_device=DEVICE, torch_dtype=torch.float16)
 
     # 生成された画像のBase64データを格納するための辞書
@@ -131,8 +130,6 @@ async def img(
             ctx,
             prompt: str
     ):
-        await ctx.response.defer()
-
         try:
             response = requests.get(self.endpoint + "generate_image",
                                     params={"prompt": prompt, "num_images": 4})  # 生成枚数は4枚固定
