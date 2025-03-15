@@ -6,7 +6,7 @@ import json
 from modal import Stub, web_endpoint
 import modal
 
-stub = Stub.App("generate_image")
+stub = Stub("generate_image")
 
 
 @stub.function(
@@ -15,7 +15,7 @@ stub = Stub.App("generate_image")
     gpu="t4",
 )
 
-@web_endpoint
+@web_endpoint()
 def run_stable_diffusion(prompt: str, num_images: int):
     import torch
     from torch import autocast
@@ -128,7 +128,7 @@ async def add(ctx, a: int, b: int):
 @bot.command()
 async def img(
             self,
-            ctx: discord.ApplicationContext,
+            ctx,
             prompt: str
     ):
         await ctx.response.defer()
