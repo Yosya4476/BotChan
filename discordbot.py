@@ -13,7 +13,6 @@ stub = Stub.App("generate_image")
     image=modal.Image.debian_slim().pip_install("torch", "diffusers[torch]", "transformers", "ftfy", "accelerate"),
     secrets=[modal.Secret.from_name("huggingface-secret")],
     gpu="t4",
-    timeout=1000
 )
 
 @web_endpoint
