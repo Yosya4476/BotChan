@@ -64,6 +64,7 @@ import traceback
 from discord.ext import commands
 from os import getenv
 from datetime import datetime, timezone
+import requests
 
 
 # Botの設定
@@ -125,8 +126,8 @@ async def add(ctx, a: int, b: int):
     await ctx.send(a+b)
 
 
-@bot.command(name="generate_image", description="画像を生成させるコマンド")
-async def generate_image(
+@bot.command()
+async def img(
             self,
             ctx: discord.ApplicationContext,
             prompt: str
