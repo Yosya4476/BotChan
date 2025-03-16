@@ -3,6 +3,7 @@ import os
 import base64
 import json
 
+# 画像生成AI部分
 from modal import Stub, web_endpoint
 import modal
 
@@ -14,7 +15,6 @@ stub = Stub("generate_image")
     secrets=[modal.Secret.from_name("huggingface-secret")],
     gpu="t4",
 )
-
 @web_endpoint()
 def run_stable_diffusion(prompt: str, num_images: int):
     import torch
@@ -56,6 +56,7 @@ def run_stable_diffusion(prompt: str, num_images: int):
     return json.dumps(base64_images_dict)
 
 
+# ボット部分
 import discord
 from dotenv import load_dotenv
 import traceback
@@ -131,7 +132,7 @@ async def img(
             prompt: str
     ):
         try:
-            response = requests.get(self.endpoint + "generate_image",
+            response = requests.get(self.endpoint + "img",
                                     params={"prompt": prompt, "num_images": 4})  # 生成枚数は4枚固定
         except requests.RequestException as e:
             self.log_util.log_command_execution(f"Failed to send request: {e}", prompt)
