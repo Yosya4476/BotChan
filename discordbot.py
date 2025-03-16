@@ -11,11 +11,10 @@ stub = Stub("generate_image")
 
 
 @stub.function(
-    image=modal.Image.debian_slim().pip_install("torch", "diffusers[torch]", "transformers", "ftfy", "accelerate"),
+    image=modal.Image.debian_slim().pip_install("torch", "diffusers[torch]", "transformers", "ftfy", "accelerate", "fastapi[standard]"),
     secrets=[modal.Secret.from_name("huggingface-secret")],
-    gpu="t4",
-)
-@web_endpoint()
+    gpu="t4")
+@modal.fastapi_endpoint()
 def run_stable_diffusion(prompt: str, num_images: int):
     import torch
     from torch import autocast
