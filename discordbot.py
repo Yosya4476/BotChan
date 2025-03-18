@@ -121,7 +121,7 @@ async def on_voice_state_update(member, before, after):
 # コマンドを入力したときの処理
 @bot.command()
 async def add(ctx, a: int, b: int):
-    await ctx.send(f"合計: {a + b} {ctx.endpoint}")
+    await ctx.send(f"合計: {a + b}")
 
 
 @bot.command()
