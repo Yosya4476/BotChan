@@ -4,7 +4,7 @@ import base64
 import json
 
 # 画像生成AI部分
-from modal import Stub, web_endpoint
+from modal import Stub
 import modal
 
 stub = Stub("generate_image")
@@ -120,21 +120,17 @@ async def on_voice_state_update(member, before, after):
   
 # コマンドを入力したときの処理
 @bot.command()
-async def add(ctx, a: int, b: int):
-    await ctx.send(a+b)
+async def add(self, ctx, a: int, b: int):
+    await ctx.send(self)
 
 
 @bot.command()
-async def img(
-            self,
-            ctx,
-            prompt: str
-    ):
+async def img(ctx, prompt: str):
         try:
-            response = requests.get(self.endpoint + "img",
+            response = requests.get(ctx.endpoint + "img",
                                     params={"prompt": prompt, "num_images": 4})  # 生成枚数は4枚固定
         except requests.RequestException as e:
-            self.log_util.log_command_execution(f"Failed to send request: {e}", prompt)
+            ctx.log_util.log_command_execution(f"Failed to send request: {e}", prompt)
             await ctx.followup.send("リクエストの送信中にエラーが発生しました")
             return
 
