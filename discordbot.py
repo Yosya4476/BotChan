@@ -121,14 +121,14 @@ async def on_voice_state_update(member, before, after):
 # コマンドを入力したときの処理
 @bot.command()
 async def add(self, ctx, a: int, b: int):
-    await ctx.send(self)
+    await ctx.send(f"合計: {a + b} {self.endpoint}")
 
 
 @bot.command()
 async def img(ctx, prompt: str):
         try:
             response = requests.get(ctx.endpoint + "img",
-                                    params={"prompt": prompt, "num_images": 4})  # 生成枚数は4枚固定
+                                    params={"prompt": prompt,})  # 生成枚数は4枚固定
         except requests.RequestException as e:
             ctx.log_util.log_command_execution(f"Failed to send request: {e}", prompt)
             await ctx.followup.send("リクエストの送信中にエラーが発生しました")
