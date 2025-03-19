@@ -57,6 +57,7 @@ def run_stable_diffusion(prompt: str, num_images: int):
 
 # ボット部分
 import discord
+from discord import Option
 from dotenv import load_dotenv
 import traceback
 from discord.ext import commands
@@ -120,24 +121,20 @@ async def on_voice_state_update(member, before, after):
   
 # コマンドを入力したときの処理
 @bot.command()
-async def add(self, ctx: discord.ApplicationContext, a: int, b: int):
-    await ctx.send(f"合計: {a + b} {self.endpoint}")
+async def add(ctx, a: int, b: int):
+    await ctx.send(f"合計: {a + b}")
 
 
 @bot.command()
-async def img(
-        self,
-        ctx: discord.ApplicationContext,
-        prompt: Option(str, description="プロンプト",)
-):
+async def img(self, ctx: discord.Interaction, prompt: str):
         
         await ctx.response.defer()
 
         try:
-            response = requests.get(ctx.endpoint + "img",
-                                    params={"prompt": prompt,})  # 生成枚数は4枚固定
+            response = requests.get(self.endpoint + "img",
+                                    params={"prompt": prompt, "num_images": 4})  # 生成枚数は4枚固定
         except requests.RequestException as e:
-            ctx.log_util.log_command_execution(f"Failed to send request: {e}", prompt)
+            self.log_util.log_command_execution(f"Failed to send request: {e}", prompt)
             await ctx.followup.send("リクエストの送信中にエラーが発生しました")
             return
 

@@ -1,5 +1,5 @@
 ### Dsicord
-pycord
+discord.py
 
 ### Other
 modal
