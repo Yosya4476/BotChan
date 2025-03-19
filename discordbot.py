@@ -17,7 +17,6 @@ stub = Stub("generate_image")
 @modal.fastapi_endpoint()
 def run_stable_diffusion(prompt: str, num_images: int):
     import torch
-    from torch import autocast
     from diffusers import StableDiffusionPipeline
 
 
@@ -57,7 +56,6 @@ def run_stable_diffusion(prompt: str, num_images: int):
 
 # ボット部分
 import discord
-from discord import Option
 from dotenv import load_dotenv
 import traceback
 from discord.ext import commands
