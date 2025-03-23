@@ -121,12 +121,12 @@ async def on_voice_state_update(member, before, after):
 
   
 # コマンドを入力したときの処理
-@bot.command(name="add", description="足し算をします")
+@bot.command()
 async def add(ctx, a: int, b: int):
     await ctx.send(f"合計: {a + b}")
 
 
-@bot.command(name="generate", description="Stable Diffusionで画像を生成します")
+@bot.command()
 async def generate(ctx, prompt: str):
     await ctx.defer()  # 処理中メッセージを表示
 
