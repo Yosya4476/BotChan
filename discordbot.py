@@ -74,6 +74,7 @@ bot = commands.Bot(command_prefix='/', intents=intents)
 # text_id = 952068860629090314
 text_id = 952047855990882317
 
+load_dotenv();
 MODAL_API = os.getenv('MODAL_API')
 
 
