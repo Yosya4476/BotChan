@@ -86,7 +86,7 @@ async def on_message(message):
       # embedを設定する
   await bot.process_commands(message)
 
-  
+
 # ボイスチャンネルの入退室時に動作する処理 #
 @bot.event
 async def on_voice_state_update(member, before, after):
@@ -126,7 +126,7 @@ async def add(ctx, a: int, b: int):
     await ctx.send(f"合計: {a + b}")
 
 
-@bot.slash_command(name="generate", description="Stable Diffusionで画像を生成します")
+@bot.tree.command(name="generate", description="Stable Diffusionで画像を生成します")
 async def generate(ctx, prompt: str):
     await ctx.defer()  # 処理中メッセージを表示
 
