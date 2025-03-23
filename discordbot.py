@@ -127,8 +127,8 @@ async def add(ctx, a: int, b: int):
 
 
 @bot.command()
-async def generate(ctx, prompt: str):
-    await ctx.defer()  # 処理中メッセージを表示
+async def generate(ctx, interaction: discord.Interaction, prompt: str):
+    await interaction.response.defer()  # 処理中メッセージを表示
 
     try:
         # ModalのAPIにリクエストを送信
@@ -139,12 +139,12 @@ async def generate(ctx, prompt: str):
         image_url = response.json().get("image_url")
 
         if image_url:
-            await ctx.respond(f"画像を生成しました: {image_url}")
+            await interaction.followup.send(f"画像を生成しました: {image_url}")
         else:
-            await ctx.respond("エラー: 画像のURLが取得できませんでした。")
+            await interaction.followup.send("エラー: 画像のURLが取得できませんでした。")
 
     except Exception as e:
-        await ctx.respond(f"エラーが発生しました: {e}")
+        await interaction.followup.send(f"エラーが発生しました: {e}")
 
 # @bot.command()
 # async def img(self, ctx, prompt: str):
