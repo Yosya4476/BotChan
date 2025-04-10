@@ -3,67 +3,16 @@ import os
 import base64
 import json
 
-from modal import Stub, web_endpoint
-import modal
-
-stub = Stub.App("generate_image")
-
-
-@stub.function(
-    image=modal.Image.debian_slim().pip_install("torch", "diffusers[torch]", "transformers", "ftfy", "accelerate"),
-    secrets=[modal.Secret.from_name("huggingface-secret")],
-    gpu="t4",
-    timeout=1000
-)
-
-@web_endpoint
-def run_stable_diffusion(prompt: str, num_images: int):
-    import torch
-    from torch import autocast
-    from diffusers import StableDiffusionPipeline
-
-
-    # 画像生成AIの設定
-    load_dotenv();
-    MODEL_ID = os.getenv('MODEL_ID')
-    DEVICE = os.getenv('DEVICE')
-    HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN')
-
-    pipe = StableDiffusionPipeline.from_pretrained(
-        MODEL_ID,
-        use_auth_token=HUGGINGFACE_TOKEN,
-    ).to(torch_device=DEVICE, torch_dtype=torch.float16)
-
-    # 生成された画像のBase64データを格納するための辞書
-    base64_images_dict = {}
-
-    for i in range(num_images):
-
-      image = pipe(prompt=prompt, width=512, height=512, 
-                   num_inference_steps=10, guidance_scale=8).images[0]
-
-    buf = io.BytesIO()
-
-    image.save(buf, format="PNG")
-
-
-    base64_data = base64.b64encode(buf.getvalue()).decode('utf-8')
-
-    base64_images_dict[f"image{i+1}"] = base64_data
-
-    buf.close()
-
-    # img_bytes = buf.getvalue()
-
-    return json.dumps(base64_images_dict)
-
-
 import discord
 from dotenv import load_dotenv
 import traceback
 from discord.ext import commands
-from os import getenv
+
 from datetime import datetime, timezone
+import requests
+from googletrans import Translator
+import aiohttp
+from aiohttp import ClientTimeout
 
 
 # Botの設定
@@ -71,11 +20,19 @@ intents = discord.Intents.all()
 intents.voice_states = True
 
 bot = commands.Bot(command_prefix='/', intents=intents)
+tree = bot.tree
 
 # voice_id = 951851320346816653
 # text_id = 952068860629090314
 text_id = 952047855990882317
 
+load_dotenv();
+MODAL_API = os.getenv('MODAL_API')
+
+# Botが立ち上がったときに行う処理
+@bot.event
+async def on_ready():
+   await tree.sync()
 
 # メッセージ受信時に動作する処理 #
 @bot.event
@@ -83,9 +40,8 @@ async def on_message(message):
   if message.content == "Ping":
     await message.channel.send("Pong!")
       # embedを設定する
-  await bot.process_commands(message)
 
-  
+
 # ボイスチャンネルの入退室時に動作する処理 #
 @bot.event
 async def on_voice_state_update(member, before, after):
@@ -115,69 +71,138 @@ async def on_voice_state_update(member, before, after):
                      icon_url=member.avatar.url)
     # embedを送信する
     await alert_channel.send(embed=embed)
-   
-  await bot.process_commands(member, before, after)
-
   
+
 # コマンドを入力したときの処理
-@bot.command()
-async def add(ctx, a: int, b: int):
-    await ctx.send(a+b)
+# 足し算をするコマンド
+@tree.command(name="add", description="足し算をします")
+async def add(ctx: discord.Interaction, a: int, b: int):
+    await ctx.response.send_message(f"合計: {a + b}")
 
+# 画像を生成するコマンド
+@tree.command(name="genarate", description="画像を生成します")
+async def generate(ctx: discord.Interaction, prompt: str, negative_prompt: str=""):
+  await ctx.response.defer()  # 処理中メッセージを表示
 
-@bot.command(name="generate_image", description="画像を生成させるコマンド")
-async def generate_image(
-            self,
-            ctx: discord.ApplicationContext,
-            prompt: str
-    ):
-        await ctx.response.defer()
+  # 入力されたテキストを英語に変換する
+  translator = Translator()
+  prompt_trans = translator.translate(prompt, src='ja', dest='en')
+  negative_prompt_trans = translator.translate(negative_prompt, src='ja', dest='en')
 
-        try:
-            response = requests.get(self.endpoint + "generate_image",
-                                    params={"prompt": prompt, "num_images": 4})  # 生成枚数は4枚固定
-        except requests.RequestException as e:
-            self.log_util.log_command_execution(f"Failed to send request: {e}", prompt)
-            await ctx.followup.send("リクエストの送信中にエラーが発生しました")
-            return
+  # Modal側で画像生成処理を行う
+  # response = requests.post(MODAL_API, json={"prompt": (await prompt_trans).text})
+  # response.raise_for_status() # エラーがある場合は例外を発生させる
 
+  timeout = ClientTimeout(total=1800)
+
+  async with aiohttp.ClientSession(timeout=timeout) as client:
+    async with client.post(MODAL_API, json={"prompt": (await prompt_trans).text, "negative_prompt": (await negative_prompt_trans).text}) as response:
+      try:
+        response.raise_for_status()
+        
         # 前提として、response.textにはBase64エンコードされた画像データのリストが含まれていると仮定します。
-        if response.status_code == 200:
-            try:
-                # 余分なエスケープシーケンスを解決する
-                parsed_str = response.text.encode().decode('unicode_escape')
+        # 余分なエスケープシーケンスを解決する
+        parsed_str = await response.text()
 
-                # 最初と最後のダブルクォートを削除し、エスケープされたダブルクォートも除去する
-                json_str = parsed_str.strip('"').replace('\\"', '"')
+        # 最初と最後のダブルクォートを削除し、エスケープされたダブルクォートも除去する
+        json_str = parsed_str.strip('"').replace('\\"', '"')
 
-                # 文字列をJSONオブジェクトに変換する
-                images_dict = json.loads(json_str)
+        # 文字列をJSONオブジェクトに変換する
+        images_dict = json.loads(json_str)
 
-                files = []
+        files = []
 
-                # 辞書の各キー（画像）に対して繰り返し処理
-                for key, base64_image in images_dict.items():
-                    # Base64文字列をバイナリデータにデコード
-                    image_data = base64.b64decode(base64_image)
-                    # バイナリデータをファイルライクオブジェクトに変換
-                    image_stream = io.BytesIO(image_data)
-                    image_stream.seek(0)
-                    # discord.Fileオブジェクトを作成し、リストに追加
-                    files.append(discord.File(image_stream, filename=f"{key}.png"))
+        # 辞書の各キー（画像）に対して繰り返し処理
+        for key, base64_image in images_dict.items():
+          # Base64文字列をバイナリデータにデコード
+          image_data = base64.b64decode(base64_image)
+          # バイナリデータをファイルライクオブジェクトに変換
+          image_stream = io.BytesIO(image_data)
+          image_stream.seek(0)
+          # discord.Fileオブジェクトを作成し、リストに追加
+          files.append(discord.File(image_stream, filename=f"{key}.png"))
 
-                # メッセージとともに画像を送信（最大10個のファイルを添付可能）
-                await ctx.followup.send(f"画像を生成しました！\n"
-                                        f"```{prompt}```", files=files)
+        # メッセージとともに画像を送信（最大10個のファイルを添付可能）
+        await ctx.followup.send(f"画像を生成しました！\n"
+                                f"```{prompt}```", files=files)
 
-            except json.JSONDecodeError:
-                await ctx.followup.send("エラー: JSONの解析に失敗しました。")
-            except Exception as e:
-                await ctx.followup.send(f"予期せぬエラーが発生しました: {e}")
-        else:
-            await ctx.followup.send(
-                f"サーバーからのレスポンスが200 OKではありません。ステータスコード: {response.status_code}")
+      except json.JSONDecodeError:
+        await ctx.followup.send("エラー: JSONの解析に失敗しました。")
+      except Exception as e:
+        await ctx.followup.send(f"予期せぬエラーが発生しました: {e}")
 
-token = getenv('DISCORD_BOT_TOKEN')
+    # try:
+    #     # ModalのAPIにリクエストを送信
+    #     response = requests.post(MODAL_API, json={"prompt": prompt})
+    #     response.raise_for_status()  # エラーがある場合は例外を発生
+
+    #     # 画像URL取得
+    #     image_url = response.json().get("image_url")
+
+    #     if image_url:
+    #         await ctx.followup.send(f"画像を生成しました: {image_url}")
+    #     else:
+    #         await ctx.followup.send("エラー: 画像のURLが取得できませんでした。")
+
+    # except Exception as e:
+    #     await ctx.followup.send(f"エラーが発生しました: {e}")
+        
+
+# @bot.command()
+# async def img(self, ctx, prompt: str):
+        
+#         await ctx.response.defer()
+
+#         try:
+#             response = requests.get(self.endpoint + "img",
+#                                     params={"prompt": prompt, "num_images": 4})  # 生成枚数は4枚固定
+#         except requests.RequestException as e:
+#             self.log_util.log_command_execution(f"Failed to send request: {e}", prompt)
+#             await ctx.followup.send("リクエストの送信中にエラーが発生しました")
+#             return
+
+#         # 前提として、response.textにはBase64エンコードされた画像データのリストが含まれていると仮定します。
+#         if response.status_code == 200:
+#             try:
+#                 # 余分なエスケープシーケンスを解決する
+#                 parsed_str = response.text.encode().decode('unicode_escape')
+
+#                 # 最初と最後のダブルクォートを削除し、エスケープされたダブルクォートも除去する
+#                 json_str = parsed_str.strip('"').replace('\\"', '"')
+
+#                 # 文字列をJSONオブジェクトに変換する
+#                 images_dict = json.loads(json_str)
+
+#                 files = []
+
+#                 # 辞書の各キー（画像）に対して繰り返し処理
+#                 for key, base64_image in images_dict.items():
+#                     # Base64文字列をバイナリデータにデコード
+#                     image_data = base64.b64decode(base64_image)
+#                     # バイナリデータをファイルライクオブジェクトに変換
+#                     image_stream = io.BytesIO(image_data)
+#                     image_stream.seek(0)
+#                     # discord.Fileオブジェクトを作成し、リストに追加
+#                     files.append(discord.File(image_stream, filename=f"{key}.png"))
+
+#                 # メッセージとともに画像を送信（最大10個のファイルを添付可能）
+#                 await ctx.followup.send(f"画像を生成しました！\n"
+#                                         f"```{prompt}```", files=files)
+
+#             except json.JSONDecodeError:
+#                 await ctx.followup.send("エラー: JSONの解析に失敗しました。")
+#             except Exception as e:
+#                 await ctx.followup.send(f"予期せぬエラーが発生しました: {e}")
+#         else:
+#             await ctx.followup.send(
+#                 f"サーバーからのレスポンスが200 OKではありません。ステータスコード: {response.status_code}")
+
+# Local環境用
+token = os.getenv('DISCORD_BOT_TOKEN')
+
+# Heroku用
+# token = getenv('DISCORD_BOT_TOKEN')
+
 bot.run(token)
 
 
