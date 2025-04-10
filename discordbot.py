@@ -99,7 +99,7 @@ async def generate(ctx: discord.Interaction, prompt: str, negative_prompt: str="
     async with client.post(MODAL_API, json={"prompt": (await prompt_trans).text, "negative_prompt": (await negative_prompt_trans).text}) as response:
       try:
         response.raise_for_status()
-        
+        print("F")
         # 前提として、response.textにはBase64エンコードされた画像データのリストが含まれていると仮定します。
         # 余分なエスケープシーケンスを解決する
         parsed_str = await response.text()
