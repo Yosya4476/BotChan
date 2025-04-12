@@ -7,6 +7,7 @@ import discord
 from dotenv import load_dotenv
 import traceback
 from discord.ext import commands
+from discord.app_commands import describe
 
 from datetime import datetime, timezone
 import requests
@@ -81,6 +82,8 @@ async def add(ctx: discord.Interaction, a: int, b: int):
 
 # 画像を生成するコマンド
 @tree.command(name="genarate", description="画像を生成します")
+@describe(prompt="指定したい条件")
+@describe(negative_prompt="適用させたくない条件")
 async def generate(ctx: discord.Interaction, prompt: str, negative_prompt: str=""):
   await ctx.response.defer()  # 処理中メッセージを表示
 
