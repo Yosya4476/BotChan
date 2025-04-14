@@ -1,4 +1,5 @@
 import io
+from os import getenv
 import os
 import base64
 import json
@@ -201,9 +202,9 @@ async def generate(ctx: discord.Interaction, prompt: str, negative_prompt: str="
 #                 f"サーバーからのレスポンスが200 OKではありません。ステータスコード: {response.status_code}")
 
 # Local環境用
-token = os.getenv('DISCORD_BOT_TOKEN')
+# token = os.getenv('DISCORD_BOT_TOKEN')
 
 # Heroku用
-# token = getenv('DISCORD_BOT_TOKEN')
+token = getenv('DISCORD_BOT_TOKEN')
 
 bot.run(token)
