@@ -128,7 +128,10 @@ async def generate(ctx: discord.Interaction, prompt: str, negative_prompt: str="
 
         # メッセージとともに画像を送信（最大10個のファイルを添付可能）
         await ctx.followup.send(f"画像を生成しました！\n"
-                                f"```{prompt}```", files=files)
+                                f"> prompt\n"
+                                f"```{prompt}```\n"
+                                f"> negative_prompt\n"
+                                f"```{negative_prompt}```", files=files)
 
       except json.JSONDecodeError:
         await ctx.followup.send("エラー: JSONの解析に失敗しました。")
