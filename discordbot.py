@@ -93,16 +93,14 @@ async def generate(ctx: discord.Interaction, prompt: str, negative_prompt: str="
   prompt_trans = translator.translate(prompt, src='ja', dest='en')
   negative_prompt_trans = translator.translate(negative_prompt, src='ja', dest='en')
 
-  # Modal側で画像生成処理を行う
-  # response = requests.post(MODAL_API, json={"prompt": (await prompt_trans).text})
-  # response.raise_for_status() # エラーがある場合は例外を発生させる
 
   timeout = ClientTimeout(total=1800)
 
+  # 画像生成中でも他のコマンドが打てるように非同期処理にする
   async with aiohttp.ClientSession(timeout=timeout) as client:
     async with client.post(MODAL_API, json={"prompt": (await prompt_trans).text, "negative_prompt": (await negative_prompt_trans).text}) as response:
       try:
-        response.raise_for_status()
+        response.raise_for_status() # エラーがある場合は例外を発生させる
 
         # 前提として、response.textにはBase64エンコードされた画像データのリストが含まれていると仮定します。
         # 余分なエスケープシーケンスを解決する
@@ -126,7 +124,7 @@ async def generate(ctx: discord.Interaction, prompt: str, negative_prompt: str="
           # discord.Fileオブジェクトを作成し、リストに追加
           files.append(discord.File(image_stream, filename=f"{key}.png"))
 
-        # メッセージとともに画像を送信（最大10個のファイルを添付可能）
+        # メッセージとともに画像を送信
         await ctx.followup.send(f"画像を生成しました！\n"
                                 f"> prompt\n"
                                 f"```{prompt}```\n"
