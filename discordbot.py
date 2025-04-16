@@ -125,11 +125,16 @@ async def generate(ctx: discord.Interaction, prompt: str, negative_prompt: str="
           files.append(discord.File(image_stream, filename=f"{key}.png"))
 
         # メッセージとともに画像を送信
-        await ctx.followup.send(f"画像を生成しました！\n"
-                                f"> prompt\n"
-                                f"```{prompt}```\n"
-                                f"> negative_prompt\n"
-                                f"```{negative_prompt}```", files=files)
+        if negative_prompt != "":
+          await ctx.followup.send(f"画像を生成しました！\n"
+                                  f"> prompt\n"
+                                  f"```{prompt}```\n"
+                                  f"> negative_prompt\n"
+                                  f"```{negative_prompt}```", files=files)
+        else:
+          await ctx.followup.send(f"画像を生成しました！\n"
+                        f"> prompt\n"
+                        f"```{prompt}```", files=files)
 
       except json.JSONDecodeError:
         await ctx.followup.send("エラー: JSONの解析に失敗しました。")
